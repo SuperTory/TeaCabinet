@@ -12,6 +12,7 @@ import DetailScreen from "./DetailScreen";
 import ScrollBanner from "./ScrollBanner";
 import ItemBar from "./ItemBar";
 import ShopScreen from './ShopScreen';
+const ServerUrl=require('./../../app').server;
 
 class FindScreen extends Component {
   static navigationOptions={
@@ -26,7 +27,7 @@ class FindScreen extends Component {
   }
 
   componentWillMount() {
-    let bannerUrl="http://192.168.1.10/TeaServer/public/bannerData";
+    let bannerUrl=ServerUrl+"bannerData";
     fetch(bannerUrl).then((res)=>res.json())
       .then((resJson)=>{
         this.setState({
@@ -36,7 +37,7 @@ class FindScreen extends Component {
       }).catch((err)=>{
       console.log(err);
     });
-    let itemUrl="http://192.168.1.10/TeaServer/public/recommend";
+    let itemUrl=ServerUrl+"recommend";
     fetch(itemUrl).then((res)=>res.json())
       .then((resJson)=>{
         this.setState({

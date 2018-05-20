@@ -57,7 +57,7 @@ class Cabinet extends Component {
         </View>
         <View style={styles.weather}>
           <Text style={styles.weatherText}>室外温度 {this.state.temp}℃</Text>
-          <Text style={styles.weatherText}>湿度 {this.state.humidity}</Text>
+          <Text style={styles.weatherText}>湿度 {this.state.humidity}%</Text>
         </View>
         <View style={styles.listWrapper}>
           <FlatList data={this.props.listData} numColumns={3}
@@ -70,19 +70,18 @@ class Cabinet extends Component {
     )
   }
 
-  renderItem(item,index){
+  renderItem({item,index}){
     return (
       <TouchableOpacity activeOpacity={0.5} style={styles.listItem}
                         onPress={()=>this.navigateTo(index)}>
-        <Image source={{uri:item.item.image}} style={styles.itemImage} />
-        <Text style={styles.itemTitle}>{item.item.title}</Text>
+        <Image source={{uri:item.image}} style={styles.itemImage} />
+        <Text style={styles.itemTitle}>{item.title}</Text>
       </TouchableOpacity>
     )
   }
 
   navigateTo(index){
-    console.log('test');
-    this.props.navigation.navigate('Detail',{"id":index});
+    this.props.navigation.navigate('Detail',{"id":index+1});
   }
 
 }
@@ -155,7 +154,7 @@ const styles = StyleSheet.create({
   columnWrapper:{
     flexDirection:'row',
     justifyContent:'space-evenly',
-    marginTop:10
+    marginTop:30
   },
   listItem:{
     width:100,
@@ -171,6 +170,7 @@ const styles = StyleSheet.create({
   },
   itemTitle:{
     color:'#fff',
-    fontSize:15
+    fontSize:15,
+    marginTop:10
   }
 });
