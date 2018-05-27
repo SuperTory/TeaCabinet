@@ -23,6 +23,8 @@ export default class DetailScreen extends Component {
     super(props);
     this.state={
       cabinetData:{},
+      target_temp:0,
+      target_humid:0
     }
   }
 
@@ -32,7 +34,9 @@ export default class DetailScreen extends Component {
     fetch(url).then(res=>res.json())
       .then((res)=>{
         this.setState({
-          cabinetData:res
+          cabinetData:res,
+          target_humid:res.target_humid,
+          target_temp:res.target_temp
         });
         console.log(ServerUrl + 'image/cabinet_image' + CabinetId);
       }).catch((err)=>{
@@ -102,7 +106,7 @@ export default class DetailScreen extends Component {
           <TouchableOpacity onPress={()=>this.setValue('temp',+1)}>
             <Image source={{uri:'cabinet_add'}} style={styles.controlBtn}/>
           </TouchableOpacity>
-          <Text style={styles.controlValue}>{this.state.cabinetData.target_temp}℃</Text>
+          <Text style={styles.controlValue}>{this.state.target_temp}℃</Text>
           <TouchableOpacity onPress={()=>this.setValue('temp',-1)}>
             <Image source={{uri:'cabinet_sub'}} style={styles.controlBtn}/>
           </TouchableOpacity>
@@ -112,13 +116,32 @@ export default class DetailScreen extends Component {
           <TouchableOpacity onPress={()=>this.setValue('humid',+1)}>
             <Image  source={{uri:'cabinet_add'}} style={styles.controlBtn}/>
           </TouchableOpacity>
-          <Text style={styles.controlValue}>{this.state.cabinetData.target_humid}%</Text>
+          <Text style={styles.controlValue}>{this.state.target_humid}%</Text>
           <TouchableOpacity onPress={()=>this.setValue('humid',-1)}>
             <Image source={{uri:'cabinet_sub'}} style={styles.controlBtn}/>
           </TouchableOpacity>
         </View>
       </View>
     )
+  }
+
+  setValue(col,opt){
+    let setUrl=ServerUrl+'setCabinet/'+CabinetId+'/'+col+'/'+opt;
+    fetch(setUrl).then(res=>res.json()).then(res=>{
+      if (res.status===0){
+        if (col==='temp') {
+          this.setState(prev=>({
+            target_temp:prev.target_temp+opt
+          }))
+        }else if (col==='humid') {
+          this.setState(prev=>({
+            target_humid:prev.target_humid+opt
+          }))
+        }
+      }else{
+        console.log(res.msg);
+      }
+    }).catch(err=>consolo.log(err))
   }
 }
 
@@ -140,7 +163,7 @@ const styles = StyleSheet.create({
     fontSize:20
   },
   info:{
-    marginTop:60,
+    marginTop:40,
     flexDirection:'row',
     justifyContent:'space-evenly'
   },
@@ -162,34 +185,38 @@ const styles = StyleSheet.create({
     height:40,
     flexDirection:'row',
     justifyContent:'space-between',
-    alignItems:'center'
+    alignItems:'center',
+    marginRight:10
   },
   introTitle:{
     color:'#fff',
-    fontSize:18
+    fontSize:18,
   },
   introValue:{
     color:'#b3b7bf',
     fontSize:16
   },
   controlColumn:{
-    flexDirection:'row'
+    flexDirection:'row',
+    marginLeft:20,
+    marginTop:20
   },
   controlTitle:{
     fontSize:18,
-    color:'#fff'
+    color:'#fff',
+    marginLeft:20,
+    marginRight:40
   },
   controlValue:{
     fontSize:16,
     color:'#b3b7bf',
     width:100,
     height:30,
-    alignItems:'center',
-    justifyContent:'center'
+    textAlign:'center',
   },
   controlBtn:{
-    width:20,
-    height:20
+    width:30,
+    height:30
   }
 
 

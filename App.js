@@ -13,10 +13,12 @@ import {
   Image
 } from 'react-native';
 import {DrawerNavigator,TabNavigator} from 'react-navigation';
-import customDrawer from './component/drawer/DrawerStack';
+import CustomDrawer from './component/drawer/DrawerStack';
 import CabinetStack from './component/cabinet/CabinetStack';
 import FindScreen from './component/find/FindScreen';
 import AccountScreen from './component/AccountScreen';
+import LoginScreen from './component/drawer/LoginScreen';
+import RegisterScreen from './component/drawer/RegisterScreen';
 
 const HomeNavigation=TabNavigator(
   {
@@ -80,10 +82,12 @@ const DevWidth=require('Dimensions').get('window').width;
 export default DrawerNavigator(
   {
     Home: {  screen: HomeNavigation },
+    Login:{screen:LoginScreen},
+    Register:{screen:RegisterScreen}
   },
   {
     drawerWidth: DevWidth*0.6,            //侧边栏的宽度
-    contentComponent:customDrawer ,
+    contentComponent:CustomDrawer ,
   }
 )
 

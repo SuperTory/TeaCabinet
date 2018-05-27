@@ -13,6 +13,9 @@ import {DrawerItems, SafeAreaView} from 'react-navigation';
 class DrawerBar extends Component{
   constructor(props){
     super(props)
+    this.state={
+      login:false
+    }
   }
   render(){
     return(
@@ -38,7 +41,9 @@ export default class CustomDrawer extends Component{
           {/*自定义区域*/}
           <View style={styles.userWrap}>
             <Image source={{uri:'user_tory'}} style={styles.userPic} />
-            <Text style={styles.username}>Super Tory</Text>
+            <TouchableOpacity onPress={this.login.bind(this)}>
+              <Text style={styles.username}>请登陆</Text>
+            </TouchableOpacity>
           </View>
           <View style={{marginTop:20}}>
             <DrawerBar title='信息' icon='drawer_message'/>
@@ -50,6 +55,9 @@ export default class CustomDrawer extends Component{
         </SafeAreaView>
       </ScrollView>
     );
+  }
+  login(){
+    this.props.navigation.navigate('Login');
   }
 }
 
