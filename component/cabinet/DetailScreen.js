@@ -10,15 +10,10 @@ import {
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 const ServerUrl=require('./../../app').server;
 let CabinetId=0;
+let myNavigation={};
+let timer;
 
 export default class DetailScreen extends Component {
-  static navigationOptions= {
-    title: '茶叶详情',
-    headerStyle: {                                 //导航栏样式设置
-      backgroundColor: '#3f475e',
-    },
-    headerTintColor: '#1fe0f3',
-  };
   constructor(props){
     super(props);
     this.state={
@@ -26,10 +21,30 @@ export default class DetailScreen extends Component {
       target_temp:0,
       target_humid:0
     }
+    myNavigation=this.props.navigation;
   }
 
-  componentWillMount() {
+  static navigationOptions= {
+    title: '茶叶详情',
+    headerStyle: {                                 //导航栏样式设置
+      backgroundColor: '#3f475e',
+    },
+    headerTintColor: '#1fe0f3',
+    headerRight:
+      <TouchableOpacity onPress={()=>myNavigation.navigate('Scan',{cabinetId:CabinetId})}>
+        <Image source={{uri:'cabinet_scan'}} style={{width:25,height:25,marginRight:20}} />
+      </TouchableOpacity>
+  };
+
+  componentDidMount() {
     CabinetId=this.props.navigation.state.params.id;
+    timer=setInterval(this.getData.bind(this),2000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(timer);
+  }
+  getData(){
     let url=ServerUrl+"cabinetData/"+CabinetId;
     fetch(url).then(res=>res.json())
       .then((res)=>{
@@ -38,7 +53,6 @@ export default class DetailScreen extends Component {
           target_humid:res.target_humid,
           target_temp:res.target_temp
         });
-        console.log(ServerUrl + 'image/cabinet_image' + CabinetId);
       }).catch((err)=>{
       console.log(err);
     });
@@ -82,7 +96,7 @@ export default class DetailScreen extends Component {
         </View>
         <View style={styles.info}>
           <View style={styles.infoLeft}>
-            <Image source={{uri:ServerUrl+'image/cabinet_image'+CabinetId+'.jpg'}}
+            <Image source={{uri:ServerUrl+'image/cabinet_image_'+this.state.cabinetData.image}}
                    style={styles.infoImage} />
           </View>
           <View>

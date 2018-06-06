@@ -6,14 +6,17 @@ import {
   View,
   Image,
   FlatList,
-  TouchableOpacity
+  TouchableOpacity,
+  ToastAndroid
 } from 'react-native';
 import {StackNavigator} from 'react-navigation';
 import DetailScreen from './DetailScreen';
+import ScanScreen from './ScanScreen';
+const ServerUrl=require('./../../app').server;
 
 class Cabinet extends Component {
-  static navigationOptions={
-    header:renderHeader
+  static navigationOptions= {
+    header: null
   };
   static defaultProps={
     listData:[
@@ -29,7 +32,8 @@ class Cabinet extends Component {
     super(props);
     this.state={
       "temp":0,
-      "humidity":0
+      "humidity":0,
+      "info":{}
     }
   }
 
@@ -42,6 +46,12 @@ class Cabinet extends Component {
       });
       console.log(res.result.sk);
     }).catch(err=>console.log(err));
+    fetch(ServerUrl+'checkInfo').then(res=>res.json()).then(res=>{
+      console.log(res);
+      this.setState({
+        info:res
+      })
+    }).catch(err=>console.log(err));
   }
   render() {
     return (
@@ -50,11 +60,7 @@ class Cabinet extends Component {
           智能茶叶柜
         </Text>
         <Text style={styles.line}> </Text>
-        <View style={styles.info}>
-          <Text style={styles.infoText}>系统信息：</Text>
-          <Text style={styles.infoText}>运行正常</Text>
-          <Image source={{uri:'cabinet_normal'}} style={styles.infoBadge} />
-        </View>
+        {this.renderInfo()}
         <View style={styles.weather}>
           <Text style={styles.weatherText}>室外温度 {this.state.temp}℃</Text>
           <Text style={styles.weatherText}>湿度 {this.state.humidity}%</Text>
@@ -80,25 +86,46 @@ class Cabinet extends Component {
     )
   }
 
-  navigateTo(index){
-    this.props.navigation.navigate('Detail',{"id":index+1});
+  renderInfo(){
+    let ret;
+    if (this.state.info.status===0){
+      ret=
+        <View style={styles.info}>
+          <Text style={styles.infoText}>系统信息：</Text>
+          <Text style={styles.infoText}>{this.state.info.msg}</Text>
+          <Image source={{uri:'cabinet_normal'}} style={styles.infoBadge} />
+        </View>
+    }else if(this.state.info.status===2){
+      ret=<View style={styles.info}>
+        <Text style={styles.infoText}>您好，欢迎使用！请登陆</Text>
+      </View>
+    }else if(this.state.info.status===3){
+      ret=<View style={styles.info}>
+        <Text style={styles.infoText}>系统信息：</Text>
+        <Text style={styles.infoText}>{this.state.info.msg}</Text>
+        <Image source={{uri:'cabinet_abnormal'}} style={styles.infoBadge} />
+      </View>
+    }
+    return ret;
   }
 
-}
-function renderHeader() {
-  return(
-    <View style={styles.header}>
-      <TouchableOpacity>
-        <Image source={{uri:'cabinet_scan'}} style={{width:25,height:25}} />
-      </TouchableOpacity>
-    </View>
-  )
+  navigateTo(index){
+    fetch(ServerUrl+'checkLogin').then(res=>res.json()).then(res=>{
+      if (res.status===0){
+        this.props.navigation.navigate('Detail',{"id":index+1});
+      }else if(res.status===1){
+        ToastAndroid.show(res.msg,ToastAndroid.SHORT);
+      }
+    }).catch(err=>console.log(err));
+  }
+
 }
 
 export default StackNavigator(
   {
     Cabinet:{screen:Cabinet},
-    Detail:{screen:DetailScreen}
+    Detail:{screen:DetailScreen},
+    Scan:{screen:ScanScreen}
   }
 )
 
@@ -110,17 +137,10 @@ const styles = StyleSheet.create({
     paddingLeft:20,
     paddingRight:20
   },
-  header:{
-    height:50,
-    alignItems:'flex-end',
-    justifyContent:'center',
-    backgroundColor:'#3f475e',
-    paddingRight:20,
-  },
   title:{
     fontSize:30,
     color:'#fff',
-    marginTop:20
+    marginTop:60
   },
   line:{
     width:DevWidth*0.25,
@@ -134,7 +154,7 @@ const styles = StyleSheet.create({
   },
   infoText:{
     color:'#fff',
-    fontSize:20
+    fontSize:18
   },
   infoBadge:{
     width:15,
@@ -146,7 +166,8 @@ const styles = StyleSheet.create({
   },
   weatherText:{
     color:'#fff',
-    marginRight:20
+    marginRight:20,
+    fontSize:15
   },
   listWrapper:{
     marginTop:50

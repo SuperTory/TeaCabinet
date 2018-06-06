@@ -6,7 +6,8 @@ import {
   View,
   Image,
   TouchableOpacity,
-  TextInput
+  TextInput,
+  ToastAndroid
 } from 'react-native';
 const ServerUrl=require('./../../app').server;
 
@@ -71,19 +72,22 @@ export default class LoginScreen extends Component {
     });
   }
   login(){
+    //通过fetch以Post的方式发送用户名、密码
     fetch(ServerUrl+'login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: 'username='+this.state.username+"&password="+this.state.password
-    }).then(res=>res.json()).then(res=>{
-      if (res.status===0){
+    }).then(res=>res.json()).then(res=>{//promise异步接收返回数据
+      if (res.status===0){//登录成功
+        ToastAndroid.show(res.msg,ToastAndroid.SHORT);
+        this.props.navigation.state.params.drawerLog(this.state.username);
         this.props.navigation.navigate('Home')
-      }else {
+      }else {//登录失败提示
         ToastAndroid.show(res.msg,ToastAndroid.SHORT);
       }
-    }).catch(err=>console.log(err))
+    }).catch(err=>console.log(err))//捕获服务器请求异常
   }
 }
 

@@ -1,5 +1,5 @@
 {
   "name": "TeaCabinet",
   "displayName": "TeaCabinet",
-  "server":"http://39.106.167.244/TeaServer/public/"
+  "server":"http://192.168.1.10/TeaServer/public/"
 }
